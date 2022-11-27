@@ -75,7 +75,7 @@ function execute(id, rejectLow, rejectHigh)
     if (id === null) return;
 
     extractChannels(id);
-    fitChannels(id);
+    fitChannels(id, rejectLow, rejectHigh);
     combineChannels(id);
     ImageWindow.windowById(id + SUFFIX_R).forceClose();
     ImageWindow.windowById(id + SUFFIX_G).forceClose();
@@ -162,7 +162,7 @@ function GUI()
             button.text = "Execute";
             button.width = 40;
             button.onClick = () => {
-                execute(data.targetId);
+                execute(data.targetId, data.rejectLow, data.rejectHigh);
                 this.ok();
             }
             sizer.add(button);
