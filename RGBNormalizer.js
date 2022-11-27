@@ -3,6 +3,7 @@
 #feature-id Utilities > RGB Normalizer
 #feature-info Performs a linear fit on RGB channels.
 
+#include <pjsr/NumericControl.jsh>
 #include <pjsr/Sizer.jsh>
 #include <pjsr/TextAlign.jsh>
 
@@ -14,13 +15,19 @@ var SUFFIX_B = "_B";
 function Data()
 {
     this.targetId = undefined;
+    this.rejectLow = 0.00;
+    this.rejectHigh = 0.92
 
     this.export = () => {
         Parameters.set("targetId", this.targetId);
+        Parameters.set("rejectLow", this.rejectLow);
+        Parameters.set("rejectHigh", this.rejectHigh);
     };
 
     this.import = () => {
         if (Parameters.has("targetId")) this.targetId = Parameters.getString("targetId");
+        if (Parameters.has("rejectLow")) this.rejectLow = Parameters.getString("rejectLow");
+        if (Parameters.has("rejectHigh")) this.rejectHigh = Parameters.getString("rejectHigh");
     };
 }
 
@@ -39,12 +46,12 @@ function extractChannels(id)
     return P.executeOn(View.viewById(id));
 }
 
-function fitChannels(id)
+function fitChannels(id, rejectLow, rejectHigh)
 {
     var P = new LinearFit;
     P.referenceViewId = id + SUFFIX_G;
-    P.rejectLow = 0.000000;
-    P.rejectHigh = 0.920000;
+    P.rejectLow = rejectLow;
+    P.rejectHigh = rejectHigh;
 
     return P.executeOn(View.viewById(id + SUFFIX_R)) & P.executeOn(View.viewById(id + SUFFIX_B));
 }
@@ -63,7 +70,7 @@ function combineChannels(id)
     return P.executeGlobal();
 }
 
-function execute(id)
+function execute(id, rejectLow, rejectHigh)
 {
     if (id === null) return;
 
@@ -97,7 +104,7 @@ function GUI()
         {
             let label = new Label();
             label.text = "Target:";
-            label.textAlignment = TextAlign_Right | TextAlign_VertCenter;
+            label.textAlignment = TextAlign_Left | TextAlign_VertCenter;
             sizer.add(label);
         }
         {
@@ -109,6 +116,30 @@ function GUI()
             sizer.add(selector);
         }
         this.sizer.add(sizer);
+    }
+    {
+        let slider = new NumericControl();
+        slider.label.text = "Reject low:";
+        slider.setRange(0, 1);
+        slider.setPrecision(2);
+        slider.setValue(data.rejectLow);
+        slider.slider.setRange(0, 100);
+        slider.onValueUpdated = (value) => {
+            data.rejectLow = value;
+        };
+        this.sizer.add(slider);
+    }
+    {
+        let slider = new NumericControl();
+        slider.label.text = "Reject high:";
+        slider.setRange(0, 1);
+        slider.setPrecision(2);
+        slider.setValue(data.rejectHigh);
+        slider.slider.setRange(0, 100);
+        slider.onValueUpdated = (value) => {
+            data.rejectHigh = value;
+        };
+        this.sizer.add(slider);
     }
     this.sizer.addStretch();
     {
@@ -147,7 +178,7 @@ data.import();
 
 if (Parameters.isViewTarget)
 {
-    execute(Parameters.targetView.id);
+    execute(Parameters.targetView.id, data.rejectLow, data.rejectHigh);
 }
 else if (Parameters.isGlobalTarget)
 {}
