@@ -16,7 +16,7 @@ function Data()
 {
     this.targetId = undefined;
     this.rejectLow = 0.00;
-    this.rejectHigh = 0.92
+    this.rejectHigh = 0.92;
 
     this.export = () => {
         Parameters.set("targetId", this.targetId);
@@ -26,8 +26,8 @@ function Data()
 
     this.import = () => {
         if (Parameters.has("targetId")) this.targetId = Parameters.getString("targetId");
-        if (Parameters.has("rejectLow")) this.rejectLow = Parameters.getString("rejectLow");
-        if (Parameters.has("rejectHigh")) this.rejectHigh = Parameters.getString("rejectHigh");
+        if (Parameters.has("rejectLow")) this.rejectLow = Parameters.getReal("rejectLow");
+        if (Parameters.has("rejectHigh")) this.rejectHigh = Parameters.getReal("rejectHigh");
     };
 }
 
@@ -94,8 +94,8 @@ function GUI()
     {
         // Script description
         let desc = new Label();
-        desc.text = "A script that normalizes RGB channels."
-        this.sizer.add(desc)
+        desc.text = "A script that normalizes RGB channels.";
+        this.sizer.add(desc);
     }
     {
         // Target selector
