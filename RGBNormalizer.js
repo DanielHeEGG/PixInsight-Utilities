@@ -163,7 +163,6 @@ function GUI()
             button.width = 40;
             button.onClick = () => {
                 execute(data.targetId, data.rejectLow, data.rejectHigh);
-                this.ok();
             }
             sizer.add(button);
         }
